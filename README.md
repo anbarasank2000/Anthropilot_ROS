@@ -1,4 +1,3 @@
-# Anthropilot_ROS
 # Trial 1: TurtleBot3 in Custom World with SLAM and Navigation
 
 This package spawns a TurtleBot3 in a custom Gazebo world, runs SLAM to build a map, and uses Nav2 for autonomous navigation.
