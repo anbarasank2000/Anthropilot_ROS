@@ -13,6 +13,7 @@ This package spawns a TurtleBot3 in a custom Gazebo world, runs SLAM to build a 
 Make sure your workspace is sourced:
 ```bash
 source ~/anthropilot/install/setup.bash
+export TURTLEBOT3_MODEL=burger
 ```
 ## 🚀 Usage
 - 1. Launch Gazebo with TurtleBot3
@@ -61,8 +62,5 @@ Load the map and run Nav2 for autonomous navigation.
 Default robot: TurtleBot3 Burger.
 
 Make sure to set the correct environment variable before running:
-
-- export TURTLEBOT3_MODEL=burger
-
 
 Use RViz2 to visualize /map, /scan, and the robot model.
