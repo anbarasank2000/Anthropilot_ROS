@@ -8,7 +8,7 @@ This package spawns a TurtleBot3 in a custom Gazebo world, runs SLAM to build a 
 - ROS 2 Humble
 - `turtlebot3`, `turtlebot3_gazebo`, `turtlebot3_description`
 - `slam_toolbox`
-- `nav2_bringup`
+- `nav2_bringup`  
 Make sure your gazebo model path is sourced
 ```bash
 export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:<path>/Anthropilot_ROS/src
