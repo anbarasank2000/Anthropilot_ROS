@@ -12,6 +12,7 @@ This package spawns a TurtleBot3 in a custom Gazebo world, runs SLAM to build a 
     
 Make sure your gazebo model path is sourced
 ```bash
+export TURTLEBOT3_MODEL=burger
 export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:<path>/Anthropilot_ROS/src
 source ~/.bashrc
 ```
@@ -19,8 +20,6 @@ Make sure your workspace is built and sourced:
 ```bash
 colcon build
 source ~/Anthropilot_ROS/install/setup.bash
-export TURTLEBOT3_MODEL=burger
-
 ```
 ## 🚀 Usage
 - 1. Launch Gazebo with TurtleBot3
