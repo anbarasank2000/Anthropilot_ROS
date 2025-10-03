@@ -11,6 +11,10 @@
         <uri>model://Room</uri>
         <pose>0 0 0 0 0 0</pose>
     </include>
+    <include>
+      <uri>model://cube_20k</uri>
+      <pose>0 2 0 0 0 0</pose>
+    </include>
     <!-- Add more models or objects here -->
   </world>
 </sdf>

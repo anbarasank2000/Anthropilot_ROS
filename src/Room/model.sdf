@@ -118,6 +118,7 @@
       </visual>
       <pose>-7.37154 -1.73431 0 0 -0 1.57391</pose>
     </link>
+    
     <static>1</static>
   </model>
 </sdf>
