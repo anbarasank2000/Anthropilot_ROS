@@ -7,46 +7,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(nav2_core REQUIRED)
-find_package(nav2_util REQUIRED)
-find_package(std_srvs REQUIRED)
-
-# sources for recovery plugin
-include_directories(include)
-
-add_library(trial_1_recovery SHARED
-  src/spin_recovery.cpp
-)
-
-ament_target_dependencies(trial_1_recovery
-  rclcpp
-  rclcpp_lifecycle
-  geometry_msgs
-  pluginlib
-  nav2_core
-  nav2_util
-  std_srvs
-)
-
-target_compile_features(trial_1_recovery PUBLIC c_std_11 cxx_std_17)
-
-install(TARGETS trial_1_recovery
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-install(DIRECTORY include/
-  DESTINATION include
-)
-
-install(FILES plugin_description.xml
-  DESTINATION share/${PROJECT_NAME}
-)
+# uncomment the following section in order to fill in
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

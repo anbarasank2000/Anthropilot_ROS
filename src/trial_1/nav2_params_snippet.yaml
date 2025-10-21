@@ -1,7 +1,0 @@
-# Add this to the recovery_behaviors section of your nav2_params.yaml
-recovery_behaviors:
-  - name: "SpinRecovery"
-    plugin: "trial_1::SpinRecovery"
-    spin_yaw_rate: 1.0
-    spin_duration: 3.0
-    call_clear_costmaps: true
