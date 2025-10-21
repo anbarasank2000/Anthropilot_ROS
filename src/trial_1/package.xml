@@ -9,10 +9,29 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <build_depend>pluginlib</build_depend>
+  <build_depend>nav2_core</build_depend>
+  <build_depend>rclcpp</build_depend>
+  <build_depend>rclcpp_lifecycle</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>nav2_core</exec_depend>
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>rclcpp_lifecycle</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+    <build_depend>nav2_util</build_depend>
+    <exec_depend>nav2_util</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
+      <pluginlib plugin_package="trial_1">
+        <class name="trial_1::SpinRecovery" type="trial_1::SpinRecovery" base_class_type="nav2_core::Recovery"/>
+      </pluginlib>
   </export>
 </package>

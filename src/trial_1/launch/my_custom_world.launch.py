@@ -9,7 +9,7 @@ def generate_launch_description():
     world_file = os.path.join(
         get_package_share_directory('trial_1'),
         'worlds',
-        'my_custom_world.world'
+        'world3.world'
     )
 
     gazebo = IncludeLaunchDescription(

@@ -1,0 +1,5 @@
+<library path="lib/libtrial_1_recovery">
+  <class name="trial_1::SpinRecovery" type="trial_1::SpinRecovery" base_class_type="nav2_core::Recovery">
+    <description>Simple spin-in-place recovery behavior for TB3</description>
+  </class>
+</library>
