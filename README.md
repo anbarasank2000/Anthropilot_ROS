@@ -1,6 +1,6 @@
 # TurtleBot3 Navigation with Teleop Recovery Behavior
 
-This package extends your existing TurtleBot3 navigation setup with a custom teleop recovery system. When navigation fails, you can take over control using teleoperation and then resume autonomous navigation.
+A ROS 2 package for TurtleBot3 autonomous navigation with SLAM mapping and a custom teleop recovery system. When navigation fails, you can take over control using teleoperation and then resume autonomous navigation.
 
 ## 🎯 Features
 
@@ -9,7 +9,7 @@ This package extends your existing TurtleBot3 navigation setup with a custom tel
 3. **Seamless Resume**: Press `r` to resume navigation to the last goal after manual control
 4. **State Management**: Clear state machine managing IDLE, NAVIGATING, TELEOP_RECOVERY states
 
-## 📁 New Files
+## 📁 Package Structure
 
 ```
 trial_1/
@@ -19,10 +19,23 @@ trial_1/
 │   ├── teleop_keyboard_recovery.py   # Keyboard teleop with recovery integration
 │   └── teleop_trigger.py             # CLI tool for triggering recovery
 ├── launch/
-│   ├── teleop_recovery.launch.py     # Launch recovery system (use this!)
-│   └── nav2_with_recovery.launch.py  # Combined Nav2 + recovery
+│   ├── my_custom_world.launch.py     # Gazebo simulation
+│   ├── nav2_navigation.launch.py     # Nav2 autonomous navigation
+│   ├── teleop_keyboard.launch.py     # Basic keyboard teleop
+│   ├── teleop_recovery.launch.py     # Teleop recovery system
+│   ├── nav2_with_recovery.launch.py  # Combined Nav2 + recovery
+│   └── slam_toolbox.launch.py        # SLAM mapping
 ├── config/
-│   └── nav2_params.yaml              # Nav2 parameters (reference)
+│   └── nav2_params.yaml              # Nav2 parameters
+├── worlds/
+│   ├── my_custom_world.world         # Custom Gazebo worlds
+│   ├── world2.world
+│   └── world3.world
+├── map/
+│   ├── map.yaml                      # Saved SLAM map
+│   └── map.pgm
+├── urdf/
+│   └── tb3_fixed.urdf                # Robot description
 ├── resource/
 │   └── trial_1                       # Ament resource marker
 ├── setup.py
@@ -30,32 +43,26 @@ trial_1/
 └── package.xml
 ```
 
-## 🚀 Installation
+## 🚀 Setup
 
-1. **Copy the new files to your existing `trial_1` package:**
+**Prerequisites:**
+- ROS 2 Humble
+- TurtleBot3 packages
+- Nav2 and SLAM Toolbox
 
-```bash
-# Backup your existing package first!
-cp -r ~/Anthropilot_ROS/src/trial_1 ~/Anthropilot_ROS/src/trial_1_backup
-
-# Extract the new files (adjust path as needed)
-unzip trial_1_teleop_recovery.zip -d /tmp/
-cp -r /tmp/trial_1/trial_1 ~/Anthropilot_ROS/src/trial_1/
-cp /tmp/trial_1/launch/teleop_recovery.launch.py ~/Anthropilot_ROS/src/trial_1/launch/
-cp /tmp/trial_1/setup.py ~/Anthropilot_ROS/src/trial_1/
-cp /tmp/trial_1/setup.cfg ~/Anthropilot_ROS/src/trial_1/
-cp /tmp/trial_1/package.xml ~/Anthropilot_ROS/src/trial_1/
-
-# Create resource directory if it doesn't exist
-mkdir -p ~/Anthropilot_ROS/src/trial_1/resource
-touch ~/Anthropilot_ROS/src/trial_1/resource/trial_1
-```
-
-2. **Build the workspace:**
+**Build the workspace:**
 
 ```bash
 cd ~/Anthropilot_ROS
+
+# Set environment variables
+export TURTLEBOT3_MODEL=burger
+export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(pwd)/src
+
+# Build
 colcon build --packages-select trial_1
+
+# Source the workspace
 source install/setup.bash
 ```
 
