@@ -1,17 +1,13 @@
 """
 Full Navigation Launch File
-Launches all necessary components for TurtleBot3 navigation with teleop recovery
-in separate terminal windows with a single command.
-
-Terminals launched:
-1. Gazebo simulation with TurtleBot3
-2. Nav2 navigation stack
-3. Teleop recovery state machine
-4. Keyboard teleop (for manual control)
+Launches TurtleBot3 Waffle Pi with Nav2, teleop recovery, and camera view.
 """
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, TimerAction
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.event_handlers import OnProcessStart
+from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
 
@@ -19,101 +15,87 @@ import os
 def generate_launch_description():
     pkg_share = get_package_share_directory('trial_1')
 
-    # Common environment setup commands
-    env_setup = (
-        'source /opt/ros/humble/setup.bash && '
-        'source ~/Work/Anthropilot_ROS/install/setup.bash && '
-        'export TURTLEBOT3_MODEL=burger && '
-        'export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:~/Work/Anthropilot_ROS/src'
+    # === 1. Gazebo simulation (from my_custom_world.launch.py) ===
+    world_file = os.path.join(pkg_share, 'worlds', 'world3.world')
+
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')
+        ),
+        launch_arguments={'world': world_file}.items(),
     )
 
-    # Terminal 1: Gazebo simulation
-    gazebo_cmd = (
-        f'{env_setup} && '
-        'echo "=== GAZEBO SIMULATION ===" && '
-        'ros2 launch trial_1 my_custom_world.launch.py'
+    robot_description_file = os.path.join(pkg_share, 'urdf', 'tb3_fixed.urdf')
+    with open(robot_description_file, 'r') as f:
+        robot_description = f.read()
+
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'use_sim_time': True, 'robot_description': robot_description}]
     )
 
-    gazebo_terminal = ExecuteProcess(
-        cmd=['xterm', '-title', 'Gazebo Simulation', '-fa', 'Monospace', '-fs', '10',
-             '-bg', 'black', '-fg', 'green', '-e', 'bash', '-c', gazebo_cmd],
+    spawn_robot = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('turtlebot3_gazebo'), 'launch', 'spawn_turtlebot3.launch.py')
+        ),
+        launch_arguments={'x_pose': '0.0', 'y_pose': '0.0', 'z_pose': '0.0', 'model': 'waffle_pi'}.items(),
+    )
+
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(get_package_share_directory('slam_toolbox'), 'rviz', 'slam_toolbox.rviz')],
+        parameters=[{'use_sim_time': True}]
+    )
+
+    # === 2. Nav2 + SLAM (delayed start via shell) ===
+    nav2_cmd = ExecuteProcess(
+        cmd=['bash', '-c',
+             'sleep 12 && ros2 launch nav2_bringup bringup_launch.py '
+             'use_sim_time:=True slam:=True '
+             f'map:={os.path.join(pkg_share, "map", "map.yaml")}'],
         output='screen'
     )
 
-    # Terminal 2: Nav2 navigation (delayed to let Gazebo start)
-    nav2_cmd = (
-        f'{env_setup} && '
-        'echo "=== NAV2 NAVIGATION ===" && '
-        'echo "Waiting for Gazebo to initialize..." && '
-        'sleep 10 && '
-        'ros2 launch trial_1 nav2_navigation.launch.py'
+    slam_node = ExecuteProcess(
+        cmd=['bash', '-c',
+             'sleep 12 && ros2 run slam_toolbox sync_slam_toolbox_node --ros-args -p use_sim_time:=true'],
+        output='screen'
     )
 
-    nav2_terminal = TimerAction(
-        period=5.0,
-        actions=[
-            ExecuteProcess(
-                cmd=['xterm', '-title', 'Nav2 Navigation', '-fa', 'Monospace', '-fs', '10',
-                     '-bg', 'black', '-fg', 'cyan', '-e', 'bash', '-c', nav2_cmd],
-                output='screen'
-            )
-        ]
+    # === 3. Teleop recovery node (delayed) ===
+    teleop_recovery = ExecuteProcess(
+        cmd=['bash', '-c',
+             'sleep 20 && ros2 run trial_1 teleop_recovery_node --ros-args -p use_sim_time:=true'],
+        output='screen'
     )
 
-    # Terminal 3: Teleop recovery system (delayed further)
-    recovery_cmd = (
-        f'{env_setup} && '
-        'echo "=== TELEOP RECOVERY SYSTEM ===" && '
-        'echo "Waiting for Nav2 to initialize..." && '
-        'sleep 20 && '
-        'ros2 launch trial_1 teleop_recovery.launch.py'
+    # === 4. Interactive keyboard teleop (xterm window) ===
+    teleop_script = os.path.join(pkg_share, 'launch', 'teleop_starter.sh')
+    keyboard_teleop = ExecuteProcess(
+        cmd=['bash', '-c', f'sleep 5 && xterm -title "Keyboard Teleop" -fa Monospace -fs 12 -geometry 60x25 -e bash {teleop_script}'],
+        output='screen'
     )
 
-    recovery_terminal = TimerAction(
-        period=10.0,
-        actions=[
-            ExecuteProcess(
-                cmd=['xterm', '-title', 'Teleop Recovery', '-fa', 'Monospace', '-fs', '10',
-                     '-bg', 'black', '-fg', 'yellow', '-e', 'bash', '-c', recovery_cmd],
-                output='screen'
-            )
-        ]
-    )
-
-    # Terminal 4: Keyboard teleop (delayed, needs user focus)
-    teleop_cmd = (
-        f'{env_setup} && '
-        'echo "=== KEYBOARD TELEOP ===" && '
-        'echo "" && '
-        'echo "Controls:" && '
-        'echo "  f = Force teleop mode (takeover)" && '
-        'echo "  r = Resume navigation" && '
-        'echo "  c = Cancel navigation" && '
-        'echo "  w/x = Linear velocity +/-" && '
-        'echo "  a/d = Angular velocity +/-" && '
-        'echo "  s = Stop" && '
-        'echo "  q = Quit" && '
-        'echo "" && '
-        'echo "Waiting for recovery system..." && '
-        'sleep 25 && '
-        'ros2 run trial_1 teleop_keyboard_recovery'
-    )
-
-    teleop_terminal = TimerAction(
-        period=15.0,
-        actions=[
-            ExecuteProcess(
-                cmd=['xterm', '-title', 'Keyboard Teleop - FOCUS HERE', '-fa', 'Monospace', '-fs', '12',
-                     '-bg', '#1a1a2e', '-fg', 'white', '-geometry', '80x30',
-                     '-e', 'bash', '-c', teleop_cmd],
-                output='screen'
-            )
-        ]
+    # === 5. Camera view (delayed GUI) ===
+    camera_view = ExecuteProcess(
+        cmd=['bash', '-c', 'sleep 15 && ros2 run rqt_image_view rqt_image_view /camera/image_raw'],
+        output='screen'
     )
 
     return LaunchDescription([
-        gazebo_terminal,
-        nav2_terminal,
-        recovery_terminal,
-        teleop_terminal,
+        gazebo,
+        robot_state_publisher,
+        spawn_robot,
+        rviz,
+        nav2_cmd,
+        slam_node,
+        teleop_recovery,
+        keyboard_teleop,
+        camera_view,
     ])

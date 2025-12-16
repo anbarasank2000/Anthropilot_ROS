@@ -50,7 +50,7 @@ def generate_launch_description():
             'x_pose': '0.0',
             'y_pose': '0.0',
             'z_pose': '0.0',
-            'model': 'burger'
+            'model': 'waffle_pi'
         }.items(),
     )
 
