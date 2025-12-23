@@ -66,9 +66,27 @@ colcon build --packages-select trial_1
 source install/setup.bash
 ```
 
-## 📖 Usage - CORRECT LAUNCH SEQUENCE
+## 📖 Usage
 
-You need **4 terminals**. The keyboard input happens in **Terminal 4**.
+### 🚀 Option 1: Quick Start (All-in-One)
+
+You can launch the entire system (Gazebo, Nav2, SLAM, and Teleop) with a single command. This will automatically open a new `xterm` window for keyboard control.
+
+**Prerequisite:** Install xterm
+```bash
+sudo apt install xterm
+```
+
+**Launch Command:**
+```bash
+ros2 launch trial_1 full_navigation.launch.py
+```
+
+*Note: Wait for the "Keyboard Teleop" window to appear. Click on it to control the robot.*
+
+### 🛠️ Option 2: Manual Launch (Debugging)
+
+Use this sequence if you need to debug individual components. You need **4 terminals**. The keyboard input happens in **Terminal 4**.
 
 ### Terminal 1: Launch Gazebo with TurtleBot3
 ```bash
